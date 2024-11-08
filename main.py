@@ -34,6 +34,32 @@ def wrc_scraper(wrc_edition: str, event_id: str) -> list[list[str, str, int]]:
     return wrc_results
 
 
+def ema_scraper(tournament_code: str, event_id: str) -> list[list[str, str, int]]:
+    """
+    Scrapes EMA tournament results from the internet.
+
+    :param tournament_code: EMA tournament code (part of the url)
+    :param event_id: Event ID for the database
+    :return: Tournament results data
+    """
+
+    url = f'http://http://mahjong-europe.org/ranking/Tournament/{tournament_code}.html'
+    raise NotImplementedError('Coming soon!')
+
+
+def riichiout_scraper(tournament_code: str, event_id: str) -> list[list[str, str, int]]:
+    """
+    Scrapes RiichiOut tournament results from the internet.
+
+    :param tournament_code: RiichiOut tournament code (part of the url)
+    :param event_id: Event ID for the database
+    :return: Tournament results data
+    """
+
+    url = f'https://riichiout.com/tournaments/{tournament_code}'
+    raise NotImplementedError('Coming soon!')
+
+
 def write_to_csv(filename: str, data: list[list[str, str, int]]) -> None:
     """
     Writes a tournament's results to a CSV file.
