@@ -14,7 +14,6 @@ def wrc_scraper(wrc_edition: str, event_id: str) -> list[list[str, str, int]]:
 
     url = f'https://worldriichi.org/{wrc_edition}'
     page = requests.get(url)
-
     soup = BeautifulSoup(page.content, 'html.parser')
 
     first_name_tds = soup.find_all('td', class_='table-cell-3')
@@ -43,8 +42,22 @@ def ema_scraper(tournament_code: str, event_id: str) -> list[list[str, str, int]
     :return: Tournament results data
     """
 
-    url = f'http://http://mahjong-europe.org/ranking/Tournament/{tournament_code}.html'
-    raise NotImplementedError('Coming soon!')
+    url = f'http://mahjong-europe.org/ranking/Tournament/{tournament_code}.html'
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    results_table = soup.find('div', class_='TCTT_lignes')
+    results_rows = results_table.find_all('div')
+    results_rows.pop(0)  # Remove header
+
+    tournament_results = [['event_id', 'player_id', 'first_name', 'last_name', 'placement', 'score']]
+
+    for row in results_rows:
+        cells = row.find_all('p')
+        data = [event_id, '', cells[3].text.capitalize(), cells[2].text.capitalize(), cells[0].text, cells[6].text]
+        tournament_results.append(data)
+
+    return tournament_results
 
 
 def riichiout_scraper(tournament_code: str, event_id: str) -> list[list[str, str, int]]:
@@ -75,9 +88,9 @@ def write_to_csv(filename: str, data: list[list[str, str, int]]) -> None:
 
 if __name__ == '__main__':
     # region WRC
-    wrc_2014 = wrc_scraper(wrc_edition='paris-2014', event_id='2014-019999')
-    wrc_2017 = wrc_scraper(wrc_edition='las-vegas-2017', event_id='2017-019999')
-    wrc_2022 = wrc_scraper(wrc_edition='vienna-2022', event_id='2022-019999')
+    # wrc_2014 = wrc_scraper(wrc_edition='paris-2014', event_id='2014-019999')
+    # wrc_2017 = wrc_scraper(wrc_edition='las-vegas-2017', event_id='2017-019999')
+    # wrc_2022 = wrc_scraper(wrc_edition='vienna-2022', event_id='2022-019999')
 
     # write_to_csv(filename='wrc_2014_results', data=wrc_2014)
     # write_to_csv(filename='wrc_2017_results', data=wrc_2017)
@@ -86,8 +99,10 @@ if __name__ == '__main__':
 
     # region EMA
     riichi_supernova_2024 = ema_scraper(tournament_code='TR_RCR_342', event_id='2024-019999')
+
+    write_to_csv(filename='riichi_supernova_2024_results', data=riichi_supernova_2024)
     # endregion EMA
 
     # region RiichiOut
-    mro_2022 = riichiout_scraper(tournament_code='7th_Montréal_Riichi_Open', event_id='2022-019999')
+    # mro_2022 = riichiout_scraper(tournament_code='7th_Montréal_Riichi_Open', event_id='2022-019999')
     # endregion RiichiOut
