@@ -57,10 +57,8 @@ def ema_scraper(tournament_code: str, event_id: str) -> list[list[str, str, int]
         first_name = cells[3].text.capitalize()
         last_name = cells[2].text.capitalize()
         if first_name == '- ema guest -':
-            print(first_name + " " + last_name)
             first_name = last_name.split(' ')[0]
             last_name = last_name.split(' ')[1].capitalize()
-            print(first_name + " " + last_name)
 
         placement = cells[0].text
         score = cells[6].text
