@@ -3,7 +3,7 @@ This is a tool to scrape mahjong tournament results from the internet.
 
 ## Supported sites
 - World Riichi Championship
+- European Mahjong Association
 
 ## Planned additions
-- European Mahjong Association
 - RiichiOut

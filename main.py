@@ -1,76 +1,7 @@
-import requests
 import csv
-from bs4 import BeautifulSoup
+from typing import Callable
 
-
-def wrc_scraper(wrc_edition: str, event_id: str) -> list[list[str, str, int]]:
-    """
-    Scrapes WRC tournament results from the internet.
-
-    :param wrc_edition: WRC edition (part of the url)
-    :param event_id: Event ID for the database
-    :return: Tournament results data
-    """
-
-    url = f'https://worldriichi.org/{wrc_edition}'
-    page = requests.get(url)
-    soup = BeautifulSoup(page.content, 'html.parser')
-
-    first_name_tds = soup.find_all('td', class_='table-cell-3')
-    last_name_tds = soup.find_all('td', class_='table-cell-2')
-    placement_tds = soup.find_all('td', class_='table-cell-1')
-    # country_tds = soup.find_all('td', class_='table-cell-4')
-
-    wrc_results = [['event_id', 'player_id', 'first_name', 'last_name', 'placement', 'score']]
-
-    for first_name_td, last_name_td, placement_td in zip(first_name_tds, last_name_tds, placement_tds):
-        first_name = first_name_td.text.capitalize()
-        last_name = last_name_td.text.capitalize()
-        placement = placement_td.text
-        data = [event_id, '', first_name, last_name, placement, '']
-        wrc_results.append(data)
-
-    return wrc_results
-
-
-def ema_scraper(tournament_code: str, event_id: str) -> list[list[str, str, int]]:
-    """
-    Scrapes EMA tournament results from the internet.
-
-    :param tournament_code: EMA tournament code (part of the url)
-    :param event_id: Event ID for the database
-    :return: Tournament results data
-    """
-
-    url = f'http://mahjong-europe.org/ranking/Tournament/{tournament_code}.html'
-    page = requests.get(url)
-    soup = BeautifulSoup(page.content, 'html.parser')
-
-    results_table = soup.find('div', class_='TCTT_lignes')
-    results_rows = results_table.find_all('div')
-    results_rows.pop(0)  # Remove header
-
-    tournament_results = [['event_id', 'player_id', 'first_name', 'last_name', 'placement', 'score']]
-
-    for row in results_rows:
-        cells = row.find_all('p')
-        data = [event_id, '', cells[3].text.capitalize(), cells[2].text.capitalize(), cells[0].text, cells[6].text]
-        tournament_results.append(data)
-
-    return tournament_results
-
-
-def riichiout_scraper(tournament_code: str, event_id: str) -> list[list[str, str, int]]:
-    """
-    Scrapes RiichiOut tournament results from the internet.
-
-    :param tournament_code: RiichiOut tournament code (part of the url)
-    :param event_id: Event ID for the database
-    :return: Tournament results data
-    """
-
-    url = f'https://riichiout.com/tournaments/{tournament_code}'
-    raise NotImplementedError('Coming soon!')
+from scrapers import wrc_scraper, ema_scraper, riichiout_scraper
 
 
 def write_to_csv(filename: str, data: list[list[str, str, int]]) -> None:
@@ -81,28 +12,28 @@ def write_to_csv(filename: str, data: list[list[str, str, int]]) -> None:
     :param data: Results data
     """
 
-    with open(f'{filename}.csv', mode='w', encoding='utf-8', newline='') as file:
-        writer = csv.writer(file)
+    with open(f'./results/{filename}.csv', mode='w', encoding='utf-8', newline='') as results_file:
+        writer = csv.writer(results_file)
         writer.writerows(data)
 
 
+def scrape_tournaments(path: str, scraper: Callable) -> None:
+    """
+    Scrapes the web for tournament results and outputs them to a CSV file.
+
+    :param scraper: Scraper function to use (EMA, WRC, etc.)
+    :param path: The path to the CSV file containing data for the tournaments to scrape
+    """
+
+    with open(path, mode='r', encoding='utf-8', newline='') as tournaments:
+        csv_reader = csv.DictReader(tournaments, delimiter=',', quotechar='"')
+        for row in csv_reader:
+            print(f"Scraping results for {row['results_file_name'].removesuffix('_results')}")
+            data = scraper(tournament_code=row['tournament_code'], event_id=row['event_id'])
+            write_to_csv(filename=row['results_file_name'], data=data)
+            print("Done! Moving to next tournament in queue.\n")
+
+
 if __name__ == '__main__':
-    # region WRC
-    # wrc_2014 = wrc_scraper(wrc_edition='paris-2014', event_id='2014-019999')
-    # wrc_2017 = wrc_scraper(wrc_edition='las-vegas-2017', event_id='2017-019999')
-    # wrc_2022 = wrc_scraper(wrc_edition='vienna-2022', event_id='2022-019999')
-
-    # write_to_csv(filename='wrc_2014_results', data=wrc_2014)
-    # write_to_csv(filename='wrc_2017_results', data=wrc_2017)
-    # write_to_csv(filename='wrc_2022_results', data=wrc_2022)
-    # endregion WRC
-
-    # region EMA
-    riichi_supernova_2024 = ema_scraper(tournament_code='TR_RCR_342', event_id='2024-019999')
-
-    write_to_csv(filename='riichi_supernova_2024_results', data=riichi_supernova_2024)
-    # endregion EMA
-
-    # region RiichiOut
-    # mro_2022 = riichiout_scraper(tournament_code='7th_Montréal_Riichi_Open', event_id='2022-019999')
-    # endregion RiichiOut
+    scrape_tournaments(path='./tournaments/wrc.csv', scraper=wrc_scraper)
+    scrape_tournaments(path='./tournaments/ema.csv', scraper=ema_scraper)
