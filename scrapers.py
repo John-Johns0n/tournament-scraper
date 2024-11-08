@@ -53,7 +53,19 @@ def ema_scraper(tournament_code: str, event_id: str) -> list[list[str, str, int]
 
     for row in results_rows:
         cells = row.find_all('p')
-        data = [event_id, '', cells[3].text.capitalize(), cells[2].text.capitalize(), cells[0].text, cells[6].text]
+
+        first_name = cells[3].text.capitalize()
+        last_name = cells[2].text.capitalize()
+        if first_name == '- ema guest -':
+            print(first_name + " " + last_name)
+            first_name = last_name.split(' ')[0]
+            last_name = last_name.split(' ')[1].capitalize()
+            print(first_name + " " + last_name)
+
+        placement = cells[0].text
+        score = cells[6].text
+
+        data = [event_id, '', first_name, last_name, placement, score]
         tournament_results.append(data)
 
     return tournament_results
