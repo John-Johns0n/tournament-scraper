@@ -74,10 +74,20 @@ def write_to_csv(filename: str, data: list[list[str, str, int]]) -> None:
 
 
 if __name__ == '__main__':
-    wrc_2014 = wrc_scraper(wrc_edition='paris-2014', event_id='2014-010001')
-    wrc_2017 = wrc_scraper(wrc_edition='las-vegas-2017', event_id='2017-010001')
-    wrc_2022 = wrc_scraper(wrc_edition='vienna-2022', event_id='2022-010001')
+    # region WRC
+    wrc_2014 = wrc_scraper(wrc_edition='paris-2014', event_id='2014-019999')
+    wrc_2017 = wrc_scraper(wrc_edition='las-vegas-2017', event_id='2017-019999')
+    wrc_2022 = wrc_scraper(wrc_edition='vienna-2022', event_id='2022-019999')
 
-    write_to_csv(filename='wrc_2014_results', data=wrc_2014)
-    write_to_csv(filename='wrc_2017_results', data=wrc_2017)
-    write_to_csv(filename='wrc_2022_results', data=wrc_2022)
+    # write_to_csv(filename='wrc_2014_results', data=wrc_2014)
+    # write_to_csv(filename='wrc_2017_results', data=wrc_2017)
+    # write_to_csv(filename='wrc_2022_results', data=wrc_2022)
+    # endregion WRC
+
+    # region EMA
+    riichi_supernova_2024 = ema_scraper(tournament_code='TR_RCR_342', event_id='2024-019999')
+    # endregion EMA
+
+    # region RiichiOut
+    mro_2022 = riichiout_scraper(tournament_code='7th_Montréal_Riichi_Open', event_id='2022-019999')
+    # endregion RiichiOut
