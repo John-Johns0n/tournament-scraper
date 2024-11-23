@@ -44,7 +44,7 @@ def ema_scraper(tournament_code: str, event_id: str) -> list[list]:
         if last_name == '':
             last_name = '(last name)'
 
-        # Handle empty first names (why is this even allowed?
+        # Handle empty first names (why is this even allowed?)
         if first_name == '-':
             first_name = '(first name)'
 
