@@ -10,6 +10,7 @@ def capitalize_multiple_names(first_name, last_name) -> tuple[str, str]:
     first_name = ' '.join('-'.join(part.capitalize() for part in group.split('-')) for group in first_name.split(' '))
     last_name = ' '.join('-'.join(part.capitalize() for part in group.split('-')) for group in last_name.split(' '))
 
+    # Turn "Linden, van der" into "van der Linden"
     parts = last_name.split(', ')
     if len(parts) > 1:
         last_name = f'{parts[1]} {parts[0]}'
