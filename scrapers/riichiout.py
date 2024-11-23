@@ -35,7 +35,14 @@ def riichiout_scraper(tournament_code: str, event_id: str) -> list[list]:
         first_name, last_name = sanitization.capitalize_multiple_names(first_name, last_name)
 
         placement = cells[0].text.strip('stndrth ')
+        if placement == 'DNF':
+            placement = 9999
+
         score = cells[2].text.split('/')[0].strip(' +')
+        if score == 'DNF':
+            score = None
+        else:
+            score = int(float(score.replace('−', '-')) * 1000)  # Replace Unicode minus with ASCII minus
 
         tournament_results.append([event_id, '', first_name, last_name, placement, score])
 
