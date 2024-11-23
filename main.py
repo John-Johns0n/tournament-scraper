@@ -1,7 +1,7 @@
 import csv
 from typing import Callable
 
-from scrapers import wrc_scraper, ema_scraper, riichiout_scraper
+from scrapers import wrc, ema, riichiout
 
 
 def write_to_csv(filename: str, path: str, data: list[list[str, str, int]]) -> None:
@@ -36,19 +36,23 @@ def scrape_tournaments(data_path: str, destination_path: str, scraper: Callable)
             print("Done! Moving to next tournament in queue.\n")
 
 
-if __name__ == '__main__':
+def main() -> None:
     scrape_tournaments(
         data_path='./tournaments/wrc.csv',
         destination_path='./results/wrc',
-        scraper=wrc_scraper
+        scraper=wrc.wrc_scraper
     )
     scrape_tournaments(
         data_path='./tournaments/ema.csv',
         destination_path='./results/ema',
-        scraper=ema_scraper
+        scraper=ema.ema_scraper
     )
     scrape_tournaments(
         data_path='./tournaments/riichiout.csv',
         destination_path='results/riichiout',
-        scraper=riichiout_scraper
+        scraper=riichiout.riichiout_scraper
     )
+
+
+if __name__ == '__main__':
+    main()
