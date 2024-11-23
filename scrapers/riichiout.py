@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+from scrapers import sanitization
+
 
 def riichiout_scraper(tournament_code: str, event_id: str) -> list[list]:
     """
@@ -22,13 +24,17 @@ def riichiout_scraper(tournament_code: str, event_id: str) -> list[list]:
 
     for row in rows:
         cells = row.find_all('td')
-        placement = cells[0].text.rstrip('stndrth')
-        full_name = cells[1].find('a').text
+
+        full_name = cells[1].find('a').text.strip()
         try:
             first_name, last_name = full_name.split(' ')
         except ValueError:  # No last name
             first_name = full_name
             last_name = '(last name)'
+
+        first_name, last_name = sanitization.capitalize_multiple_names(first_name, last_name)
+
+        placement = cells[0].text.strip('stndrth ')
         score = cells[2].text.split('/')[0].strip(' +')
 
         tournament_results.append([event_id, '', first_name, last_name, placement, score])

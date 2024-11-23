@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+from scrapers import sanitization
+
 
 def ema_scraper(tournament_code: str, event_id: str) -> list[list]:
     """
@@ -24,14 +26,33 @@ def ema_scraper(tournament_code: str, event_id: str) -> list[list]:
     for row in results_rows:
         cells = row.find_all('p')
 
-        first_name = cells[3].text.capitalize()
-        last_name = cells[2].text.capitalize()
+        first_name = cells[3].text.capitalize().strip()
+        last_name = cells[2].text.capitalize().strip()
+
+        # Handle EMA guests
         if first_name == '- ema guest -':
             first_name = last_name.split(' ')[0]
             last_name = last_name.split(' ')[1].capitalize()
 
-        placement = cells[0].text
-        score = cells[6].text
+        # Handle unregistered players (full name is in first name field, last name field is '-')
+        if last_name == '-':
+            names = first_name.split(' ')
+            first_name = names[0]
+            last_name = ' '.join(names[1:])
+
+        # Handle empty last names (NOT the same)
+        if last_name == '':
+            last_name = '(last name)'
+
+        # Handle empty first names (why is this even allowed?
+        if first_name == '-':
+            first_name = '(first name)'
+
+        # Handle capitalizing hyphenated/multiple names
+        first_name, last_name = sanitization.capitalize_multiple_names(first_name, last_name)
+
+        placement = cells[0].text.strip()
+        score = cells[6].text.strip()
 
         data = [event_id, '', first_name, last_name, placement, score]
         tournament_results.append(data)

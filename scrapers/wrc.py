@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+from scrapers import sanitization
+
 
 def wrc_scraper(tournament_code: str, event_id: str) -> list[list]:
     """
@@ -23,9 +25,15 @@ def wrc_scraper(tournament_code: str, event_id: str) -> list[list]:
     wrc_results = [['event_id', 'player_id', 'first_name', 'last_name', 'placement', 'score']]
 
     for first_name_td, last_name_td, placement_td in zip(first_name_tds, last_name_tds, placement_tds):
-        first_name = first_name_td.text.capitalize()
-        last_name = last_name_td.text.capitalize()
-        placement = placement_td.text
+        first_name = first_name_td.text.strip()
+        last_name = last_name_td.text.strip(', ')
+        if last_name in ('', '-'):
+            last_name = '(last name)'
+
+        first_name, last_name = sanitization.capitalize_multiple_names(first_name, last_name)
+
+        placement = placement_td.text.strip()
+
         data = [event_id, '', first_name, last_name, placement, '']
         wrc_results.append(data)
 

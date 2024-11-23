@@ -1,7 +1,7 @@
 import csv
 from typing import Callable
 
-from scrapers import wrc, ema, riichiout
+from scrapers import *
 
 
 def write_to_csv(filename: str, path: str, data: list[list[str, str, int]]) -> None:
