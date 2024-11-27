@@ -36,7 +36,7 @@ def riichiout_scraper(tournament_code: str, event_id: str) -> list[list]:
 
         placement = cells[0].text.strip('stndrth ')
         if placement == 'DNF':
-            placement = 9999
+            placement = -1
 
         score = cells[2].text.split('/')[0].strip(' +')
         if score == 'DNF':
